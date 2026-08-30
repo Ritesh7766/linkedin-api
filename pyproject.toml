@@ -27,3 +27,12 @@ dependencies = [
     "requests>=2.31",
     "uvicorn[standard]",
 ]
+
+[project.optional-dependencies]
+dev = [
+    "black",
+    "mypy",
+    "pre-commit",
+    "ruff",
+    "types-requests",
+]

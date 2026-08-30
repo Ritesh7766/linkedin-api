@@ -1,6 +1,6 @@
 # LinkedIn API
 
-[![Build](https://img.shields.io/github/actions/workflow/status/RiteshSaha8145/linkedin-api/ci.yml?label=build)](https://github.com/RiteshSaha8145/linkedin-api/actions)
+[![Build](https://github.com/RiteshSaha8145/linkedin-api/actions/workflows/ci.yml/badge.svg)](https://github.com/RiteshSaha8145/linkedin-api/actions/workflows/ci.yml)
 [![Python](https://img.shields.io/badge/python-3.12-blue)](https://www.python.org/)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
