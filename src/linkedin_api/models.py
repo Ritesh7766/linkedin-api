@@ -17,3 +17,19 @@ class ComponentResponse(BaseModel):
     component: str
     status_code: int
     data: str
+
+
+class Profile(BaseModel):
+    """
+    Parsed data from a LinkedIn Above Activity response.
+
+    Parameters
+    ----------
+    profile_id : str or None
+        LinkedIn profile ID extracted from the response.
+    about : str or None
+        About text extracted from the response.
+    """
+
+    profile_id: str | None
+    about: str | None
