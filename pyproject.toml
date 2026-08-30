@@ -1,0 +1,26 @@
+[project]
+name = "linkedin-api"
+version = "0.1.0"
+description = "Python client for extracting publicly available LinkedIn profile information"
+readme = "README.md"
+requires-python = ">=3.12"
+
+authors = [
+    { name = "Ritesh Saha", email = "riteshsaha214@gmail.com" },
+]
+
+license = { text = "MIT" }
+
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+]
+
+dependencies = [
+    "requests>=2.31",
+]
