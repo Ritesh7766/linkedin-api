@@ -1,4 +1,3 @@
-# fetchers/profile.py
 
 from linkedin_api.client import LinkedInClient
 
