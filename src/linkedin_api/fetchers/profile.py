@@ -1,10 +1,11 @@
-
 from linkedin_api.client import LinkedInClient
 
 
 ABOVE_ACTIVITY_COMPONENT = (
-    "com.linkedin.sdui.generated.profile.dsl.impl."
-    "profileCardsAboveActivity"
+    "com.linkedin.sdui.generated.profile.dsl.impl." "profileCardsAboveActivity"
+)
+ACTIVITY_COMPONENT = (
+    "com.linkedin.sdui.generated.profile.dsl.impl." "profileCardsActivity"
 )
 
 
@@ -41,17 +42,51 @@ def fetch_above_activity(
                 },
             },
             "states": [],
-            "requestMetadata": {
-                "$type": "proto.sdui.common.RequestMetadata"
-            },
-            "screenId": (
-                "com.linkedin.sdui.flagshipnav.profile.Profile"
-            ),
+            "requestMetadata": {"$type": "proto.sdui.common.RequestMetadata"},
+            "screenId": ("com.linkedin.sdui.flagshipnav.profile.Profile"),
             "knownTemplateIds": [],
         }
     }
 
     return client.fetch_component(
         component=ABOVE_ACTIVITY_COMPONENT,
+        payload=payload,
+    )
+
+
+def fetch_activity(
+    client: LinkedInClient,
+    vanity_name: str,
+) -> str:
+    """
+    Fetch the Activity component for a LinkedIn profile.
+
+    Parameters
+    ----------
+    client : LinkedInClient
+        Authenticated LinkedIn client used to make the request.
+    vanity_name : str
+        Vanity name of the LinkedIn profile.
+
+    Returns
+    -------
+    str
+        Raw response body returned by LinkedIn.
+    """
+    payload = {
+        "clientArguments": {
+            "payload": {
+                "isSelfView": False,
+                "vanityName": vanity_name,
+            },
+            "states": [],
+            "requestMetadata": {"$type": "proto.sdui.common.RequestMetadata"},
+            "screenId": ("com.linkedin.sdui.flagshipnav.home.Home"),
+            "knownTemplateIds": [],
+        }
+    }
+
+    return client.fetch_component(
+        component=ACTIVITY_COMPONENT,
         payload=payload,
     )
