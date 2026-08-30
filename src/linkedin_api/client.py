@@ -9,11 +9,32 @@ import requests
 
 @dataclass(frozen=True)
 class LinkedInClient:
+    """
+    Client for making authenticated requests to LinkedIn's component API.
+
+    Parameters
+    ----------
+    li_at : str
+        LinkedIn session authentication cookie value.
+    jsessionid : str
+        LinkedIn session ID and CSRF token value.
+    timeout : float, default=30.0
+        Maximum number of seconds to wait for an HTTP response.
+
+    Attributes
+    ----------
+    BASE_URL : str
+        Base URL for LinkedIn.
+    COMPONENT_ENDPOINT : str
+        Endpoint used to request LinkedIn components.
+    """
+
     li_at: str
     jsessionid: str
     timeout: float = 30.0
 
     BASE_URL: ClassVar[str] = "https://www.linkedin.com"
+
     COMPONENT_ENDPOINT: ClassVar[str] = (
         f"{BASE_URL}/flagship-web/"
         "rsc-action/actions/component"
@@ -21,6 +42,15 @@ class LinkedInClient:
 
     @cached_property
     def session(self) -> requests.Session:
+        """
+        Return the configured HTTP session.
+
+        Returns
+        -------
+        requests.Session
+            Session configured with the required headers and
+            LinkedIn authentication cookies.
+        """
         session = requests.Session()
 
         session.headers.update({
@@ -51,6 +81,28 @@ class LinkedInClient:
         component: str,
         payload: dict,
     ) -> str:
+        """
+        Fetch a LinkedIn component.
+
+        Parameters
+        ----------
+        component : str
+            Identifier of the LinkedIn component to request.
+        payload : dict
+            JSON request body expected by the component endpoint.
+
+        Returns
+        -------
+        str
+            Raw response body returned by LinkedIn.
+
+        Raises
+        ------
+        requests.HTTPError
+            If LinkedIn returns an unsuccessful HTTP status code.
+        requests.RequestException
+            If the request fails due to a network or transport error.
+        """
         response = self.session.post(
             self.COMPONENT_ENDPOINT,
             params={

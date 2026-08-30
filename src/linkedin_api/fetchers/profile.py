@@ -13,6 +13,21 @@ def fetch_above_activity(
     client: LinkedInClient,
     vanity_name: str,
 ) -> str:
+    """
+    Fetch the Above Activity component for a LinkedIn profile.
+
+    Parameters
+    ----------
+    client : LinkedInClient
+        Authenticated LinkedIn client used to make the request.
+    vanity_name : str
+        Vanity name of the LinkedIn profile.
+
+    Returns
+    -------
+    str
+        Raw response body returned by LinkedIn.
+    """
     payload = {
         "clientArguments": {
             "payload": {
