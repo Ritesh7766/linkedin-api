@@ -7,7 +7,7 @@ from linkedin_api.models import Profile
 
 
 class AboveActivityData(TypedDict):
-    profile_id: str | None
+    profile_id: str
     about: str | None
 
 
@@ -56,7 +56,7 @@ def _parse_above_activity(data: str) -> AboveActivityData:
         else None
     )
     return {
-        "profile_id": (profile_id_match.group(1) if profile_id_match else None),
+        "profile_id": profile_id_match.group(1) if profile_id_match else "",
         "about": about or None,
     }
 

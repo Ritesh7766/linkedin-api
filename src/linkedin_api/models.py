@@ -20,6 +20,40 @@ class ComponentResponse(BaseModel):
     data: str
 
 
+class Experience(BaseModel):
+    """
+    LinkedIn work experience entry.
+
+    Parameters
+    ----------
+    company : str
+        Company name.
+    title : str
+        Job title.
+    employment_type : str or None
+        Employment type.
+    dates : str
+        Employment dates.
+    location : str or None
+        Job location.
+    company_duration : str or None
+        Total duration at the company.
+    company_id : str or None
+        LinkedIn company ID.
+    company_url : str or None
+        LinkedIn company URL.
+    """
+
+    company: str
+    title: str
+    employment_type: str | None = None
+    dates: str
+    location: str | None = None
+    company_duration: str | None = None
+    company_id: str | None = None
+    company_url: str | None = None
+
+
 class Profile(BaseModel):
     """
     LinkedIn profile data.
@@ -38,7 +72,7 @@ class Profile(BaseModel):
         Profile About section.
     """
 
-    profile_id: str | None = None
+    profile_id: str
     member_id: str | None = None
     followers: int | None = None
     activity_url: str | None = None
