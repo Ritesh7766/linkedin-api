@@ -1,6 +1,5 @@
 from linkedin_api.client import LinkedInClient
 
-
 ABOVE_ACTIVITY_COMPONENT = (
     "com.linkedin.sdui.generated.profile.dsl.impl." "profileCardsAboveActivity"
 )
