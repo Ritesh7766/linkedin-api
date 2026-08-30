@@ -22,5 +22,8 @@ classifiers = [
 ]
 
 dependencies = [
+    "fastapi",
+    "pydantic",
     "requests>=2.31",
+    "uvicorn[standard]",
 ]
