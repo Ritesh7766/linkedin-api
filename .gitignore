@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Type checking
+.mypy_cache/
+
+# VS Code
+.vscode/
+
+# Environment / secrets
+.env
+.env.*
+
+# Packaging
+*.egg-info/
