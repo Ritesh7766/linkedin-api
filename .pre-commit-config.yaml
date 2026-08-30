@@ -1,37 +1,31 @@
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.5.0
+    rev: v6.0.0
     hooks:
       - id: trailing-whitespace
       - id: end-of-file-fixer
 
-  - repo: https://github.com/psf/black
-    rev: 22.3.0
+  - repo: https://github.com/psf/black-pre-commit-mirror
+    rev: 25.1.0
     hooks:
       - id: black
-        entry: black
-        language_version: python
-        types: [python]
-        args: [--line-length=88]
+        args:
+          - --line-length=88
         exclude: ^dist/
 
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.12.11
+    hooks:
+      - id: ruff-check
+
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.8.0
+    rev: v1.17.1
     hooks:
       - id: mypy
-        entry: mypy
-        language_version: python
-        types: [python]
-        args: [--python-version, "3.12"]
+        args:
+          - --python-version
+          - "3.12"
         additional_dependencies:
           - pydantic
           - types-requests
           - fastapi
-
-  - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.3.0
-    hooks:
-      - id: ruff
-        entry: ruff check
-        language_version: python
-        types: [python]

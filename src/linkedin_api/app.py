@@ -5,7 +5,6 @@ from linkedin_api.client import LinkedInClient
 from linkedin_api.models import Profile
 from linkedin_api.parsers.profile_parsers import get_profile
 
-
 app = FastAPI(
     title="LinkedIn API",
     version="0.1.0",
