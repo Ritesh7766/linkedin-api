@@ -3,7 +3,7 @@ from pydantic import BaseModel
 
 from linkedin_api.client import LinkedInClient
 from linkedin_api.models import Profile
-from linkedin_api.parsers import get_profile
+from linkedin_api.parsers.profile_parsers import get_profile
 
 
 app = FastAPI(
