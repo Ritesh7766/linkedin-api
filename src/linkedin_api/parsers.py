@@ -18,12 +18,10 @@ def parse_above_activity(data: str) -> Profile:
     AboveActivity
         Parsed profile ID and About text.
     """
-
     profile_id_match = re.search(
         r"ref(ACo[A-Za-z0-9_-]+)About",
         data,
     )
-
     about_match = re.search(
         r'"textProps":\{'
         r'"fontFamily":"sans",'
@@ -33,7 +31,6 @@ def parse_above_activity(data: str) -> Profile:
         data,
         re.DOTALL,
     )
-
     about = (
         "\n\n".join(
             re.findall(
@@ -44,7 +41,6 @@ def parse_above_activity(data: str) -> Profile:
         if about_match
         else None
     )
-
     return Profile(
         profile_id=(profile_id_match.group(1) if profile_id_match else None),
         about=about or None,
