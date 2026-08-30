@@ -14,6 +14,7 @@ class ComponentResponse(BaseModel):
     data : str
         Raw response body returned by the component endpoint.
     """
+
     component: str
     status_code: int
     data: str
@@ -21,15 +22,24 @@ class ComponentResponse(BaseModel):
 
 class Profile(BaseModel):
     """
-    Parsed data from a LinkedIn Above Activity response.
+    LinkedIn profile data.
 
     Parameters
     ----------
     profile_id : str or None
-        LinkedIn profile ID extracted from the response.
+        LinkedIn profile ID.
+    member_id : str or None
+        LinkedIn member ID.
+    followers : int or None
+        Number of profile followers.
+    activity_url : str or None
+        URL to the profile's recent activity.
     about : str or None
-        About text extracted from the response.
+        Profile About section.
     """
 
-    profile_id: str | None
-    about: str | None
+    profile_id: str | None = None
+    member_id: str | None = None
+    followers: int | None = None
+    activity_url: str | None = None
+    about: str | None = None
