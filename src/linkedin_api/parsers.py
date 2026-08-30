@@ -1,9 +1,23 @@
 import re
+from typing import TypedDict
 
+from linkedin_api.client import LinkedInClient
+from linkedin_api.fetchers.profile import fetch_above_activity, fetch_activity
 from linkedin_api.models import Profile
 
 
-def _parse_above_activity(data: str) -> dict[str, str | None]:
+class AboveActivityData(TypedDict):
+    profile_id: str | None
+    about: str | None
+
+
+class ActivityData(TypedDict):
+    member_id: str | None
+    followers: int | None
+    activity_url: str | None
+
+
+def _parse_above_activity(data: str) -> AboveActivityData:
     """
     Parse profile ID and About text from a raw LinkedIn
     Above Activity response.
@@ -15,7 +29,7 @@ def _parse_above_activity(data: str) -> dict[str, str | None]:
 
     Returns
     -------
-    AboveActivity
+    AboveActivityData
         Parsed profile ID and About text.
     """
     profile_id_match = re.search(
@@ -47,7 +61,7 @@ def _parse_above_activity(data: str) -> dict[str, str | None]:
     }
 
 
-def _parse_activity(data: str) -> dict[str, str | int | bool | None]:
+def _parse_activity(data: str) -> ActivityData:
     """
     Parse profile activity information from an Activity response.
 
@@ -58,7 +72,7 @@ def _parse_activity(data: str) -> dict[str, str | int | bool | None]:
 
     Returns
     -------
-    dict[str, str | int | bool | None]
+    ActivityData
         Extracted activity information.
     """
     member_match = re.search(
@@ -88,8 +102,8 @@ def _parse_activity(data: str) -> dict[str, str | int | bool | None]:
 
 
 def get_profile(
-    raw_above_activity: str,
-    raw_activity: str,
+    client: LinkedInClient,
+    vanity_name: str,
 ) -> Profile:
     """
     Fetch and assemble LinkedIn profile data.
@@ -97,7 +111,7 @@ def get_profile(
     Parameters
     ----------
     client : LinkedInClient
-        Authenticated LinkedIn client.
+        Authenticated LinkedIn client used to fetch profile data.
     vanity_name : str
         Vanity name of the LinkedIn profile.
 
@@ -106,6 +120,16 @@ def get_profile(
     Profile
         Combined profile data parsed from the available components.
     """
+
+    raw_above_activity = fetch_above_activity(
+        client,
+        vanity_name,
+    )
+
+    raw_activity = fetch_activity(
+        client,
+        vanity_name,
+    )
 
     above_activity = _parse_above_activity(raw_above_activity)
 
