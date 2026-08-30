@@ -1,0 +1,19 @@
+Metadata-Version: 2.4
+Name: linkedin-api
+Version: 0.1.0
+Summary: Python client for extracting publicly available LinkedIn profile information
+Author-email: Ritesh Saha <riteshsaha214@gmail.com>
+License: MIT
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Natural Language :: English
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.12
+Requires-Python: >=3.12
+Description-Content-Type: text/markdown
+Requires-Dist: fastapi
+Requires-Dist: pydantic
+Requires-Dist: requests>=2.31
+Requires-Dist: uvicorn[standard]
