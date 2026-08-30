@@ -1,4 +1,3 @@
-
 from dataclasses import dataclass
 from functools import cached_property
 from typing import ClassVar
@@ -35,8 +34,7 @@ class LinkedInClient:
     BASE_URL: ClassVar[str] = "https://www.linkedin.com"
 
     COMPONENT_ENDPOINT: ClassVar[str] = (
-        f"{BASE_URL}/flagship-web/"
-        "rsc-action/actions/component"
+        f"{BASE_URL}/flagship-web/" "rsc-action/actions/component"
     )
 
     @cached_property
@@ -52,25 +50,29 @@ class LinkedInClient:
         """
         session = requests.Session()
 
-        session.headers.update({
-            "User-Agent": (
-                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-                "AppleWebKit/537.36 "
-                "(KHTML, like Gecko) "
-                "Chrome/152.0.0.0 Safari/537.36"
-            ),
-            "Accept": "*/*",
-            "Accept-Language": "en-GB,en-US;q=0.9,en;q=0.8",
-            "Content-Type": "application/json",
-            "csrf-token": self.jsessionid,
-            "x-restli-protocol-version": "2.0.0",
-            "x-li-rsc-stream": "true",
-        })
+        session.headers.update(
+            {
+                "User-Agent": (
+                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                    "AppleWebKit/537.36 "
+                    "(KHTML, like Gecko) "
+                    "Chrome/152.0.0.0 Safari/537.36"
+                ),
+                "Accept": "*/*",
+                "Accept-Language": "en-GB,en-US;q=0.9,en;q=0.8",
+                "Content-Type": "application/json",
+                "csrf-token": self.jsessionid,
+                "x-restli-protocol-version": "2.0.0",
+                "x-li-rsc-stream": "true",
+            }
+        )
 
-        session.cookies.update({
-            "li_at": self.li_at,
-            "JSESSIONID": f'"{self.jsessionid}"',
-        })
+        session.cookies.update(
+            {
+                "li_at": self.li_at,
+                "JSESSIONID": f'"{self.jsessionid}"',
+            }
+        )
 
         return session
 
