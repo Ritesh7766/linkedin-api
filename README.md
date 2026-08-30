@@ -1,0 +1,39 @@
+# LinkedIn API
+
+[![Build](https://img.shields.io/github/actions/workflow/status/RiteshSaha8145/linkedin-api/ci.yml?label=build)](https://github.com/RiteshSaha8145/linkedin-api/actions)
+[![Python](https://img.shields.io/badge/python-3.12-blue)](https://www.python.org/)
+[![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+
+A Python client and API for extracting structured profile information from LinkedIn.
+
+## Purpose
+
+This project provides a lightweight Python client for interacting with LinkedIn's web application endpoints and extracting profile information such as:
+
+- Profile information
+- About section
+- Activity information
+- Experience
+- Education
+- Skills
+- Featured content
+
+The project is designed around a clear separation between fetching and parsing:
+
+```text
+LinkedIn
+   │
+   ▼
+Fetchers
+   │
+   ▼
+Raw response
+   │
+   ▼
+Parsers
+   │
+   ▼
+Pydantic models
+   │
+   ▼
+FastAPI
