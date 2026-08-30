@@ -1,6 +1,5 @@
 from linkedin_api.client import LinkedInClient
 
-
 EXPERIENCE_COMPONENT = (
     "com.linkedin.sdui.generated.profile.dsl.impl." "profileCardsExperienceOnly"
 )
