@@ -3,6 +3,7 @@
 [![Build](https://github.com/Ritesh7766/linkedin-api/actions/workflows/ci.yml/badge.svg)](https://github.com/Ritesh7766/linkedin-api/actions/workflows/ci.yml)
 [![Python](https://img.shields.io/badge/python-3.12-blue)](https://www.python.org/)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+
 **Live API:** [https://linkedin-api-8dbd.onrender.com](https://linkedin-api-8dbd.onrender.com)
 
 **Full API documentation and interactive testing interface:**
