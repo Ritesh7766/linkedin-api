@@ -79,6 +79,19 @@ class Profile(BaseModel):
     about: str | None = None
 
 
+class ProfileRequest(BaseModel):
+    """
+    Credentials and profile identifier required to fetch a profile.
+
+    Parameters
+    ----------
+    vanity_name : str
+        Vanity name of the LinkedIn profile to fetch.
+    """
+
+    vanity_name: str
+
+
 class ProfileResponse(BaseModel):
     """
     Complete LinkedIn profile response.
