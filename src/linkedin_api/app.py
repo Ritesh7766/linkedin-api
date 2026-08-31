@@ -38,7 +38,6 @@ def profile(
     experience = get_experience(
         client,
         request.vanity_name,
-        profile_data.profile_id,
     )
     sections = get_parsed_sections(
         client,

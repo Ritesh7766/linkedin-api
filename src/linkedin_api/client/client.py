@@ -32,6 +32,9 @@ class LinkedInClient:
     BASE_URL : str
         Base URL for LinkedIn.
 
+    DETAIL_ENDPOINT : str
+        URL cooresponding to a specific section like experience, skills, ...
+
     COMPONENT_ENDPOINT : str
         Endpoint used to request LinkedIn components.
     """
@@ -39,7 +42,7 @@ class LinkedInClient:
     timeout: float = 30.0
 
     BASE_URL: ClassVar[str] = "https://www.linkedin.com"
-
+    DETAIL_ENDPOINT: ClassVar[str] = f"{BASE_URL}/flagship-web/in"
     COMPONENT_ENDPOINT: ClassVar[str] = (
         f"{BASE_URL}/flagship-web/rsc-action/actions/component"
     )
@@ -120,6 +123,23 @@ class LinkedInClient:
                 "componentId": component,
                 "sduiid": component,
             },
+            json=payload,
+            timeout=self.timeout,
+        )
+
+        response.raise_for_status()
+
+        return response.text
+
+    def fetch_detail(
+        self,
+        *,
+        vanity_name: str,
+        detail: str,
+        payload: dict,
+    ) -> str:
+        response = self.session.post(
+            f"{self.DETAIL_ENDPOINT}/{vanity_name}/details/{detail}/",
             json=payload,
             timeout=self.timeout,
         )

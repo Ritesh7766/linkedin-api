@@ -1,54 +1,53 @@
-from linkedin_api.client import LinkedInClient
+from linkedin_api.client.client import LinkedInClient
 
-EXPERIENCE_COMPONENT = (
-    "com.linkedin.sdui.generated.profile.dsl.impl." "profileCardsExperienceOnly"
+
+EXPERIENCE_SCREEN_ID = (
+    "com.linkedin.sdui.flagshipnav.profile." "ProfileExperienceDetails"
 )
+
+EXPERIENCE_PAGE_KEY = "profile_view_base_position_details"
 
 
 def fetch_experience(
     client: LinkedInClient,
     vanity_name: str,
-    profile_id: str,
 ) -> str:
     """
-    Fetch the Experience component for a LinkedIn profile.
+    Fetch the raw Experience details response for a LinkedIn profile.
 
     Parameters
     ----------
     client : LinkedInClient
         Authenticated LinkedIn client used to make the request.
+
     vanity_name : str
         Vanity name of the LinkedIn profile.
-    profile_id : str
-        LinkedIn profile ID required by the Experience component.
 
     Returns
     -------
     str
-        Raw response body returned by LinkedIn.
+        Raw RSC response returned by LinkedIn's Experience details
+        endpoint.
     """
     payload = {
-        "clientArguments": {
+        "$type": "proto.sdui.actions.core.NavigateToScreen",
+        "screenId": EXPERIENCE_SCREEN_ID,
+        "pageKey": EXPERIENCE_PAGE_KEY,
+        "requestedArguments": {
             "payload": {
-                "isSelfView": False,
                 "vanityName": vanity_name,
-                "replaceableSectionArgs": {
-                    "vanityName": vanity_name,
-                    "hideCardsForGoldenGate": False,
-                    "shouldSetupReplaceableComponent": True,
-                    "vieweeProfileId": profile_id,
-                    "isSelfView": False,
-                    "isSelfViewResolved": False,
-                },
             },
             "states": [],
-            "requestMetadata": {"$type": "proto.sdui.common.RequestMetadata"},
-            "screenId": "com.linkedin.sdui.flagshipnav.profile.Profile",
+            "requestMetadata": {
+                "$type": "proto.sdui.common.RequestMetadata",
+            },
+            "screenId": "",
             "knownTemplateIds": [],
-        }
+        },
     }
 
-    return client.fetch_component(
-        component=EXPERIENCE_COMPONENT,
+    return client.fetch_detail(
+        vanity_name=vanity_name,
+        detail="experience",
         payload=payload,
     )

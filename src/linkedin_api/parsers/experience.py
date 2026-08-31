@@ -1,258 +1,103 @@
 import re
-from typing import cast
 
-from linkedin_api.client import LinkedInClient
+from linkedin_api.client.client import LinkedInClient
 from linkedin_api.fetchers.experience import fetch_experience
 from linkedin_api.models import Experience
+from linkedin_api.parsers.common import (
+    extract_text,
+    get_collection,
+    get_collection_items,
+)
 
-_MONTH = r"(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)"
+
+_EXPERIENCE_COLLECTION = "ExperienceDetailsSection"
 
 _DATE_RE = re.compile(
-    rf"^{_MONTH}\s+\d{{4}}"
-    rf"\s*-\s*"
-    rf"(?:Present|{_MONTH}\s+\d{{4}})"
-    rf"(?:\s*·\s*.+)?$"
+    r"""
+    ^
+    (?P<dates>.+?)
+    \s*·\s*
+    (?P<duration>
+        \d+\s+(?:yr|yrs|mo|mos)
+        (?:\s+\d+\s+(?:yr|yrs|mo|mos))?
+    )
+    $
+    """,
+    re.VERBOSE,
 )
 
-_LOCATION_RE = re.compile(r"^.+\s·\s(?:On-site|Remote|Hybrid)$")
 
-_DURATION_RE = re.compile(
-    r"^\d+\s+(?:yr|yrs|mo|mos)" r"(?:\s+\d+\s+(?:yr|yrs|mo|mos))?$"
-)
+def _parse_date_info(value: str) -> tuple[str, str | None]:
+    """Split a LinkedIn date string into its date range and duration."""
+    match = _DATE_RE.match(value)
 
-_EMPLOYMENT_TYPES = {
-    "Full-time",
-    "Part-time",
-    "Contract",
-    "Temporary",
-    "Volunteer",
-    "Internship",
-    "Apprenticeship",
-    "Freelance",
-    "Self-employed",
-}
-
-
-def _extract_definitions(
-    data: str,
-) -> dict[str, str]:
-    return dict(
-        re.findall(
-            r"^([0-9a-z]+):(.*)$",
-            data,
-            re.MULTILINE | re.IGNORECASE,
-        )
-    )
-
-
-def _resolve_refs(
-    data: str,
-    definitions: dict[str, str],
-) -> str:
-    reference_re = re.compile(
-        r"\$L([0-9a-z]+)",
-        re.IGNORECASE,
-    )
-
-    def resolve(
-        value: str,
-        stack: frozenset[str] = frozenset(),
-    ) -> str:
-        def replace(
-            match: re.Match[str],
-        ) -> str:
-            key = match.group(1)
-
-            if key in stack:
-                return ""
-
-            definition = definitions.get(key)
-
-            if definition is None:
-                return match.group(0)
-
-            return resolve(
-                definition,
-                stack | {key},
-            )
-
-        return reference_re.sub(
-            replace,
-            value,
-        )
-
-    return resolve(data)
-
-
-def _get_text_children(
-    data: str,
-) -> list[str]:
-    values: list[str] = []
-
-    patterns = (
-        r'"children":\["([^"]*)"\]',
-        r'"children":\[(?:null,)+"([^"]*)"\]',
-    )
-
-    for pattern in patterns:
-        values.extend(
-            match.group(1).strip()
-            for match in re.finditer(
-                pattern,
-                data,
-            )
-            if match.group(1).strip()
-        )
-
-    return values
-
-
-def _is_date(value: str) -> bool:
-    return bool(_DATE_RE.fullmatch(value))
-
-
-def _is_location(value: str) -> bool:
-    return bool(_LOCATION_RE.fullmatch(value))
-
-
-def _is_duration(value: str) -> bool:
-    return bool(_DURATION_RE.fullmatch(value))
-
-
-def _is_employment(value: str) -> bool:
-    return value in _EMPLOYMENT_TYPES
-
-
-def _split_company(
-    value: str,
-) -> tuple[str, str | None]:
-    if " · " not in value:
+    if match is None:
         return value, None
 
-    company, employment_type = value.split(
-        " · ",
-        1,
-    )
-
-    return company.strip(), employment_type.strip()
+    return match.group("dates"), match.group("duration")
 
 
-def _parse_item(
-    values: list[str],
-) -> list[Experience]:
-    date_indices = [index for index, value in enumerate(values) if _is_date(value)]
+def _parse_company(value: str) -> tuple[str, str | None]:
+    """Split a LinkedIn company string into name and employment type."""
+    company, separator, employment_type = value.partition(" · ")
 
-    if not date_indices:
+    if not separator:
+        return value, None
+
+    return company, employment_type
+
+
+def parse_experience(data: str) -> list[Experience]:
+    """
+    Parse a raw LinkedIn Experience details RSC response.
+
+    Parameters
+    ----------
+    data : str
+        Raw RSC response returned by LinkedIn's Experience details
+        endpoint.
+
+    Returns
+    -------
+    list[Experience]
+        Parsed LinkedIn work experience entries. Returns an empty
+        list when the Experience collection is not present.
+    """
+    result = get_collection(data, _EXPERIENCE_COLLECTION)
+
+    if result is None:
         return []
 
-    # Single position:
-    #
-    # Title
-    # Company · Employment
-    # Dates
-    # Location
-
-    if len(date_indices) == 1:
-        date_index = date_indices[0]
-
-        if date_index < 2:
-            return []
-
-        company, employment_type = _split_company(values[date_index - 1])
-
-        title = cast(str, values[date_index - 2])
-
-        location = None
-
-        if date_index + 1 < len(values):
-            candidate = values[date_index + 1]
-
-            if _is_location(candidate):
-                location = candidate
-
-        return [
-            Experience(
-                company=company,
-                title=title,
-                employment_type=employment_type,
-                dates=values[date_index],
-                location=location,
-            )
-        ]
-
-    # Multiple positions at one company.
-
-    company = values[0]
-    cursor = 1
-
-    company_employment = None
-    company_duration = None
-    company_location = None
-
-    if cursor < len(values):
-        metadata = values[cursor]
-
-        if " · " in metadata and not _is_date(metadata) and not _is_location(metadata):
-            employment, duration = metadata.split(
-                " · ",
-                1,
-            )
-
-            if _is_employment(employment):
-                company_employment = employment
-                company_duration = duration
-                cursor += 1
-
-        elif _is_duration(metadata):
-            company_duration = metadata
-            cursor += 1
-
-    if cursor < len(values) and _is_location(values[cursor]):
-        company_location = values[cursor]
-        cursor += 1
-
-    position_values = values[cursor:]
-
-    position_dates = [
-        index for index, value in enumerate(position_values) if _is_date(value)
-    ]
+    collection, definitions = result
+    items = get_collection_items(collection, definitions)
 
     experiences: list[Experience] = []
 
-    for date_index in position_dates:
-        title = ""
-        employment_type = company_employment
-        location = company_location
+    for item in items:
+        values = extract_text(item)
 
-        if date_index > 0:
-            previous = position_values[date_index - 1]
-
-            if _is_employment(previous):
-                employment_type = previous
-
-                if date_index > 1:
-                    title = position_values[date_index - 2]
-            else:
-                title = previous
-
-        if date_index + 1 < len(position_values):
-            candidate = position_values[date_index + 1]
-
-            if _is_location(candidate):
-                location = candidate
-
-        if not title:
+        if len(values) < 2:
             continue
 
-        if _is_date(title) or _is_location(title) or _is_duration(title):
-            continue
+        title = values[0]
+        company, employment_type = _parse_company(values[1])
+
+        dates = None
+        company_duration = None
+        location = None
+
+        if len(values) > 2:
+            dates, company_duration = _parse_date_info(values[2])
+
+        if len(values) > 3:
+            location = values[3]
 
         experiences.append(
             Experience(
-                company=company,
                 title=title,
+                company=company,
                 employment_type=employment_type,
-                dates=position_values[date_index],
+                dates=dates,
                 location=location,
                 company_duration=company_duration,
             )
@@ -261,110 +106,29 @@ def _parse_item(
     return experiences
 
 
-def parse_experience(
-    data: str,
-) -> list[Experience]:
-    """
-    Parse work experience from a raw LinkedIn Experience response.
-
-    Parameters
-    ----------
-    data : str
-        Raw response returned by the LinkedIn Experience component.
-
-    Returns
-    -------
-    list[Experience]
-        Parsed work experience entries.
-    """
-
-    definitions = _extract_definitions(data)
-
-    collection_key = next(
-        (
-            key
-            for key, value in definitions.items()
-            if '"collectionId":"profile_ExperienceTopLevelSection_' in value
-        ),
-        None,
-    )
-
-    if collection_key is None:
-        return []
-
-    collection = _resolve_refs(
-        definitions[collection_key],
-        definitions,
-    )
-
-    item_matches = list(
-        re.finditer(
-            r'"key":"(entity-collection-item-[^"]+)"',
-            collection,
-        )
-    )
-
-    experiences: list[Experience] = []
-
-    for index, match in enumerate(item_matches):
-        start = match.start()
-
-        end = (
-            item_matches[index + 1].start()
-            if index + 1 < len(item_matches)
-            else len(collection)
-        )
-
-        item = collection[start:end]
-
-        resolved_item = _resolve_refs(
-            item,
-            definitions,
-        )
-
-        values = _get_text_children(resolved_item)
-
-        values = [
-            value
-            for index, value in enumerate(values)
-            if index == 0 or value != values[index - 1]
-        ]
-
-        values = [value for value in values if value not in {"Experience", "Show all"}]
-
-        experiences.extend(_parse_item(values))
-
-    return experiences
-
-
 def get_experience(
     client: LinkedInClient,
     vanity_name: str,
-    profile_id: str | None,
 ) -> list[Experience]:
     """
-    Fetch and parse LinkedIn work experience.
+    Fetch and parse work experience for a LinkedIn profile.
 
     Parameters
     ----------
     client : LinkedInClient
-        Authenticated LinkedIn client used to fetch the experience.
+        Authenticated LinkedIn client used to make the request.
+
     vanity_name : str
         Vanity name of the LinkedIn profile.
-    profile_id : str
-        LinkedIn profile ID required by the Experience component.
 
     Returns
     -------
     list[Experience]
-        Parsed work experience entries.
+        Parsed work experience entries for the profile.
     """
-    if not profile_id:
-        return []
     return parse_experience(
         fetch_experience(
-            client,
-            vanity_name,
-            profile_id,
+            client=client,
+            vanity_name=vanity_name,
         )
     )
