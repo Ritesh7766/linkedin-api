@@ -77,6 +77,31 @@ class Profile(BaseModel):
     about: str | None = None
 
 
+class Education(BaseModel):
+    """
+    LinkedIn education entry.
+
+    Parameters
+    ----------
+    school : str or None
+        Name of the educational institution.
+
+    degree : str or None
+        Degree obtained.
+
+    field_of_study : str or None
+        Field or subject of study.
+
+    dates : str or None
+        Education date range.
+    """
+
+    school: str | None
+    degree: str | None = None
+    field_of_study: str | None = None
+    dates: str | None = None
+
+
 class ProfileRequest(BaseModel):
     """
     Credentials and profile identifier required to fetch a profile.
@@ -97,3 +122,4 @@ class ProfileResponse(BaseModel):
 
     profile: Profile
     experience: list[Experience]
+    education: list[Education]

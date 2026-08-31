@@ -1,11 +1,11 @@
 from fastapi import FastAPI
 
-from linkedin_api.client.client import LinkedInClient
-from linkedin_api.models.models import ProfileRequest, ProfileResponse
+from linkedin_api.client import LinkedInClient
+from linkedin_api.models import ProfileRequest, ProfileResponse
+from linkedin_api.parsers.education import get_education
 from linkedin_api.parsers.experience import get_experience
-from linkedin_api.parsers.profile import (
-    get_profile,
-)
+from linkedin_api.parsers.profile import get_profile
+
 
 app = FastAPI(
     title="LinkedIn API",
@@ -13,17 +13,10 @@ app = FastAPI(
 )
 
 
-@app.post(
-    "/profile",
-    response_model=ProfileResponse,
-)
-def get_linkedin_profile(
+@app.post("/profile")
+def profile(
     request: ProfileRequest,
 ) -> ProfileResponse:
-    """
-    Fetch a LinkedIn profile and its work experience.
-    """
-
     client = LinkedInClient()
     profile_data = get_profile(
         client,
@@ -34,7 +27,13 @@ def get_linkedin_profile(
         request.vanity_name,
         profile_data.profile_id,
     )
+    education = get_education(
+        client,
+        request.vanity_name,
+        profile_data.profile_id,
+    )
     return ProfileResponse(
         profile=profile_data,
         experience=experience,
+        education=education,
     )

@@ -114,7 +114,6 @@ class LinkedInClient:
         requests.RequestException
             If the request fails due to a network or transport error.
         """
-
         response = self.session.post(
             self.COMPONENT_ENDPOINT,
             params={
