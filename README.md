@@ -4,6 +4,8 @@
 [![Python](https://img.shields.io/badge/python-3.12-blue)](https://www.python.org/)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
+**Live demo:** [https://linkedin-api-8dbd.onrender.com](https://linkedin-api-8dbd.onrender.com) · interactive docs at [`/docs`](https://linkedin-api-8dbd.onrender.com/docs)
+
 A Python client and FastAPI service for extracting structured profile information from LinkedIn - profile summary, experience, education, skills, certifications, and projects - as clean JSON.
 
 ## What this is (and isn't)
@@ -88,8 +90,18 @@ The API is now available at `http://localhost:8000`, with interactive docs at `h
 
 ## Usage
 
+Against a local instance:
+
 ```bash
 curl -X POST http://localhost:8000/profile \
+  -H "Content-Type: application/json" \
+  -d '{"vanity_name": "riteshsaha7766"}'
+```
+
+Or against the hosted demo:
+
+```bash
+curl -X POST https://linkedin-api-8dbd.onrender.com/profile \
   -H "Content-Type: application/json" \
   -d '{"vanity_name": "riteshsaha7766"}'
 ```
