@@ -123,13 +123,13 @@ def _is_noise(
     """
     Return whether a value is LinkedIn rendering noise.
     """
-
-    return (
-        value in _NOISE
-        or value.startswith("$L")
-        or value.startswith("com.linkedin.sdui.")
-        or value.startswith("ProfileNullStateCardAnchor")
-        or value.startswith("profile_")
+    return value in _NOISE or value.startswith(
+        (
+            "$L",
+            "com.linkedin.sdui.",
+            "ProfileNullStateCardAnchor",
+            "profile_",
+        )
     )
 
 
