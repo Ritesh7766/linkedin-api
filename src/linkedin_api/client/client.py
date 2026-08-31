@@ -4,37 +4,44 @@ from typing import ClassVar
 
 import requests
 
+from linkedin_api.client.config import settings
+
 
 @dataclass(frozen=True)
 class LinkedInClient:
     """
     Client for making authenticated requests to LinkedIn's component API.
 
+    Authentication credentials are loaded from environment variables.
+
     Parameters
     ----------
-    li_at : str
-        LinkedIn session authentication cookie value.
-    jsessionid : str
-        LinkedIn session ID and CSRF token value.
     timeout : float, default=30.0
         Maximum number of seconds to wait for an HTTP response.
+
+    Environment Variables
+    ---------------------
+    LINKEDIN_LI_AT : str
+        LinkedIn session authentication cookie value.
+
+    LINKEDIN_JSESSIONID : str
+        LinkedIn session ID and CSRF token value.
 
     Attributes
     ----------
     BASE_URL : str
         Base URL for LinkedIn.
+
     COMPONENT_ENDPOINT : str
         Endpoint used to request LinkedIn components.
     """
 
-    li_at: str
-    jsessionid: str
     timeout: float = 30.0
 
     BASE_URL: ClassVar[str] = "https://www.linkedin.com"
 
     COMPONENT_ENDPOINT: ClassVar[str] = (
-        f"{BASE_URL}/flagship-web/" "rsc-action/actions/component"
+        f"{BASE_URL}/flagship-web/rsc-action/actions/component"
     )
 
     @cached_property
@@ -48,6 +55,7 @@ class LinkedInClient:
             Session configured with the required headers and
             LinkedIn authentication cookies.
         """
+
         session = requests.Session()
 
         session.headers.update(
@@ -61,7 +69,7 @@ class LinkedInClient:
                 "Accept": "*/*",
                 "Accept-Language": "en-GB,en-US;q=0.9,en;q=0.8",
                 "Content-Type": "application/json",
-                "csrf-token": self.jsessionid,
+                "csrf-token": settings.linkedin_jsessionid,
                 "x-restli-protocol-version": "2.0.0",
                 "x-li-rsc-stream": "true",
             }
@@ -69,8 +77,8 @@ class LinkedInClient:
 
         session.cookies.update(
             {
-                "li_at": self.li_at,
-                "JSESSIONID": f'"{self.jsessionid}"',
+                "li_at": settings.linkedin_li_at,
+                "JSESSIONID": f'"{settings.linkedin_jsessionid}"',
             }
         )
 
@@ -89,6 +97,7 @@ class LinkedInClient:
         ----------
         component : str
             Identifier of the LinkedIn component to request.
+
         payload : dict
             JSON request body expected by the component endpoint.
 
@@ -101,9 +110,11 @@ class LinkedInClient:
         ------
         requests.HTTPError
             If LinkedIn returns an unsuccessful HTTP status code.
+
         requests.RequestException
             If the request fails due to a network or transport error.
         """
+
         response = self.session.post(
             self.COMPONENT_ENDPOINT,
             params={

@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 
-from linkedin_api.client import LinkedInClient
+from linkedin_api.client.client import LinkedInClient
 from linkedin_api.parsers.experience import get_experience
 from linkedin_api.parsers.profile import (
     get_profile,
@@ -19,25 +19,16 @@ class ProfileRequest(BaseModel):
 
     Parameters
     ----------
-    csrf_token : str
-        LinkedIn JSESSIONID value used as the CSRF token.
-    auth_token : str
-        LinkedIn li_at authentication cookie value.
     vanity_name : str
         Vanity name of the LinkedIn profile to fetch.
     """
 
-    csrf_token: str
-    auth_token: str
     vanity_name: str
 
 
 @app.post("/profile")
 def profile(request: ProfileRequest) -> dict:
-    client = LinkedInClient(
-        li_at=request.auth_token,
-        jsessionid=request.csrf_token,
-    )
+    client = LinkedInClient()
 
     profile = get_profile(
         client,

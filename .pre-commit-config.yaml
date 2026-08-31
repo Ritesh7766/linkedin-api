@@ -27,5 +27,6 @@ repos:
           - "3.12"
         additional_dependencies:
           - pydantic
+          - pydantic_settings
           - types-requests
           - fastapi

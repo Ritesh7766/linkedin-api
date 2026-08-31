@@ -39,3 +39,8 @@ dev = [
 
 [tool.black]
 target-version = ["py312"]
+
+
+[tool.mypy]
+    python_version = "3.12"
+    plugins = ["pydantic.mypy"]
