@@ -9,7 +9,6 @@ from linkedin_api.parsers.common import (
     get_collection_items,
 )
 
-
 _EXPERIENCE_COLLECTION = "ExperienceDetailsSection"
 
 _DATE_RE = re.compile(

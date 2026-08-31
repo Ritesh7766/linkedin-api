@@ -1,6 +1,5 @@
 from linkedin_api.client.client import LinkedInClient
 
-
 EXPERIENCE_SCREEN_ID = (
     "com.linkedin.sdui.flagshipnav.profile." "ProfileExperienceDetails"
 )
