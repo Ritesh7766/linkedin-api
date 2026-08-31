@@ -6,7 +6,6 @@ from linkedin_api.client import LinkedInClient
 from linkedin_api.fetchers.section import fetch_profile_section
 from linkedin_api.models import Education
 
-
 _EDUCATION_COLLECTION = "EducationTopLevelSection"
 
 _REFERENCE_RE = re.compile(

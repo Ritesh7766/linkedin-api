@@ -6,7 +6,6 @@ from linkedin_api.parsers.education import get_education
 from linkedin_api.parsers.experience import get_experience
 from linkedin_api.parsers.profile import get_profile
 
-
 app = FastAPI(
     title="LinkedIn API",
     version="0.1.0",
