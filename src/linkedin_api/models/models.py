@@ -77,3 +77,12 @@ class Profile(BaseModel):
     followers: int | None = None
     activity_url: str | None = None
     about: str | None = None
+
+
+class ProfileResponse(BaseModel):
+    """
+    Complete LinkedIn profile response.
+    """
+
+    profile: Profile
+    experience: list[Experience]

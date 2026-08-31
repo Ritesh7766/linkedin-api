@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 
 from linkedin_api.client.client import LinkedInClient
+from linkedin_api.models.models import ProfileResponse
 from linkedin_api.parsers.experience import get_experience
 from linkedin_api.parsers.profile import (
     get_profile,
@@ -27,7 +28,7 @@ class ProfileRequest(BaseModel):
 
 
 @app.post("/profile")
-def profile(request: ProfileRequest) -> dict:
+def profile(request: ProfileRequest) -> ProfileResponse:
     client = LinkedInClient()
 
     profile = get_profile(
@@ -41,7 +42,7 @@ def profile(request: ProfileRequest) -> dict:
         profile.profile_id,
     )
 
-    return {
-        "profile": profile,
-        "experience": experience,
-    }
+    return ProfileResponse(
+        profile=profile,
+        experience=experience,
+    )

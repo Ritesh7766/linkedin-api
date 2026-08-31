@@ -1,3 +1,3 @@
-from .models import Experience, Profile
+from .models import Experience, Profile, ProfileResponse
 
-__all__ = ["Experience", "Profile"]
+__all__ = ["Experience", "Profile", "ProfileResponse"]
