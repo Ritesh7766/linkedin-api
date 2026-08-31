@@ -9,7 +9,6 @@ from linkedin_api.models import Education, Skill
 from linkedin_api.parsers.education import parse_education
 from linkedin_api.parsers.skills import parse_skills
 
-
 SectionParser = Callable[[str], list[Any]]
 
 

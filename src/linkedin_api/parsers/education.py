@@ -7,7 +7,6 @@ from linkedin_api.parsers.common import (
     get_collection_items,
 )
 
-
 _EDUCATION_COLLECTION = "EducationTopLevelSection"
 
 _DATE_RE = re.compile(r"^(?:\d{4}\s*[–-]\s*\d{4})$")

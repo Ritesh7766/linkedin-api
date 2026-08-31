@@ -1,7 +1,6 @@
 import json
 import re
 
-
 _REFERENCE_RE = re.compile(
     r"\$L([0-9a-z]+)",
     re.IGNORECASE,
