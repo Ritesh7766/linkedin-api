@@ -3,10 +3,14 @@
 [![Build](https://github.com/Ritesh7766/linkedin-api/actions/workflows/ci.yml/badge.svg)](https://github.com/Ritesh7766/linkedin-api/actions/workflows/ci.yml)
 [![Python](https://img.shields.io/badge/python-3.12-blue)](https://www.python.org/)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+**Live API:** [https://linkedin-api-8dbd.onrender.com](https://linkedin-api-8dbd.onrender.com)
 
-**Live demo:** [https://linkedin-api-8dbd.onrender.com](https://linkedin-api-8dbd.onrender.com) · interactive docs at [`/docs`](https://linkedin-api-8dbd.onrender.com/docs)
+**Full API documentation and interactive testing interface:**
+[https://linkedin-api-8dbd.onrender.com/docs](https://linkedin-api-8dbd.onrender.com/docs)
 
-> **Note:** The demo is hosted on Render's free tier. After a period of inactivity, the service may spin down and the first request can take up to approximately a minute to respond while the instance starts. Subsequent requests should respond normally.
+> **Please use the interactive API documentation at [`/docs`](https://linkedin-api-8dbd.onrender.com/docs) to explore and test the API.** The main service is designed to be consumed programmatically by frontend applications or other API clients rather than used directly through the root URL.
+>
+> **Note:** The demo is hosted on Render's free tier. After approximately 15 minutes of inactivity, the service may spin down. The first request may take around a minute while the service starts; subsequent requests should respond normally. :contentReference[oaicite:0]{index=0}
 
 A Python client and FastAPI service for extracting structured profile information from LinkedIn - profile summary, experience, education, skills, certifications, and projects - as clean JSON.
 
