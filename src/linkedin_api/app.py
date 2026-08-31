@@ -13,19 +13,28 @@ app = FastAPI(
 )
 
 
-@app.post("/profile")
-def profile(request: ProfileRequest) -> ProfileResponse:
+@app.post(
+    "/profile",
+    response_model=ProfileResponse,
+)
+def get_linkedin_profile(
+    request: ProfileRequest,
+) -> ProfileResponse:
+    """
+    Fetch a LinkedIn profile and its work experience.
+    """
+
     client = LinkedInClient()
-    profile = get_profile(
+    profile_data = get_profile(
         client,
         request.vanity_name,
     )
     experience = get_experience(
         client,
         request.vanity_name,
-        profile.profile_id,
+        profile_data.profile_id,
     )
     return ProfileResponse(
-        profile=profile,
+        profile=profile_data,
         experience=experience,
     )
