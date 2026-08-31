@@ -1,3 +1,5 @@
+from linkedin_api.client.client import LinkedInClient
+from linkedin_api.fetchers.skills import fetch_skills
 from linkedin_api.models import Skill
 from linkedin_api.parsers.common import (
     extract_text,
@@ -5,36 +7,76 @@ from linkedin_api.parsers.common import (
     get_collection_items,
 )
 
-_SKILLS_COLLECTION = "SkillsTopLevelSection"
 
-_NOISE = {"Skills", "Show all"}
+_SKILLS_COLLECTION = "SkillDetails"
 
 
 def parse_skills(data: str) -> list[Skill]:
     """
-    Parse skills from one raw LinkedIn profile section response.
-    """
+    Parse skill names from a raw LinkedIn Skills RSC response.
 
-    result = get_collection(data, _SKILLS_COLLECTION)
+    Parameters
+    ----------
+    data : str
+        Raw RSC response returned by LinkedIn's Skills details
+        endpoint.
+
+    Returns
+    -------
+    list[Skill]
+        Parsed LinkedIn profile skills.
+    """
+    result = get_collection(
+        data,
+        _SKILLS_COLLECTION,
+    )
 
     if result is None:
         return []
 
     collection, definitions = result
+    items = get_collection_items(collection, definitions)
+
     skills: list[Skill] = []
-    seen: set[str] = set()
 
-    for item in get_collection_items(collection, definitions):
-        for value in extract_text(item):
-            if value in _NOISE:
-                continue
+    for item in items:
+        values = extract_text(item)
 
-            if value not in seen:
-                seen.add(value)
-                skills.append(Skill(name=value))
+        if not values:
+            continue
 
-            # Each collection item's first useful text node is the skill
-            # name; later nodes are endorsements/sub-labels - skip them.
-            break
+        skills.append(
+            Skill(
+                name=values[0],
+            )
+        )
 
     return skills
+
+
+def get_skills(
+    client: LinkedInClient,
+    vanity_name: str,
+) -> list[Skill]:
+    """
+    Fetch and parse skills for a LinkedIn profile.
+
+    Parameters
+    ----------
+    client : LinkedInClient
+        Authenticated LinkedIn client used to make the request.
+
+    vanity_name : str
+        Vanity name of the LinkedIn profile.
+
+    Returns
+    -------
+    list[Skill]
+        Parsed skills returned by LinkedIn.
+    """
+    data = fetch_skills(
+        client=client,
+        vanity_name=vanity_name,
+    )
+
+    return parse_skills(data)

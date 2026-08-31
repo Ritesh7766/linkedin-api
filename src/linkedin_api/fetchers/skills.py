@@ -2,19 +2,17 @@ from linkedin_api.client.client import LinkedInClient
 from linkedin_api.utils import build_detail_payload
 
 
-EXPERIENCE_SCREEN_ID = (
-    "com.linkedin.sdui.flagshipnav.profile." "ProfileExperienceDetails"
-)
+SKILLS_SCREEN_ID = "com.linkedin.sdui.flagshipnav.profile." "ProfileSkillDetails"
 
-EXPERIENCE_PAGE_KEY = "profile_view_base_position_details"
+SKILLS_PAGE_KEY = "profile_view_base_skills_details"
 
 
-def fetch_experience(
+def fetch_skills(
     client: LinkedInClient,
     vanity_name: str,
 ) -> str:
     """
-    Fetch the raw Experience details response for a LinkedIn profile.
+    Fetch the raw Skills details response for a LinkedIn profile.
 
     Parameters
     ----------
@@ -27,17 +25,17 @@ def fetch_experience(
     Returns
     -------
     str
-        Raw RSC response returned by LinkedIn's Experience details
+        Raw RSC response returned by LinkedIn's Skills details
         endpoint.
     """
     payload = build_detail_payload(
-        screen_id=EXPERIENCE_SCREEN_ID,
-        page_key=EXPERIENCE_PAGE_KEY,
+        screen_id=SKILLS_SCREEN_ID,
+        page_key=SKILLS_PAGE_KEY,
         vanity_name=vanity_name,
     )
 
     return client.fetch_detail(
         vanity_name=vanity_name,
-        detail="experience",
+        detail="skills",
         payload=payload,
     )
