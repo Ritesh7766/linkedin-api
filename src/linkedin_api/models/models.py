@@ -44,10 +44,10 @@ class Experience(BaseModel):
         LinkedIn company URL.
     """
 
-    company: str
-    title: str
+    company: str | None
+    title: str | None
     employment_type: str | None = None
-    dates: str
+    dates: str | None
     location: str | None = None
     company_duration: str | None = None
     company_id: str | None = None
@@ -72,7 +72,7 @@ class Profile(BaseModel):
         Profile About section.
     """
 
-    profile_id: str
+    profile_id: str | None = None
     member_id: str | None = None
     followers: int | None = None
     activity_url: str | None = None
