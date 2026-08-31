@@ -11,7 +11,7 @@
 
 > **Please use the interactive API documentation at [`/docs`](https://linkedin-api-8dbd.onrender.com/docs) to explore and test the API.** The main service is designed to be consumed programmatically by frontend applications or other API clients rather than used directly through the root URL.
 >
-> **Note:** The demo is hosted on Render's free tier. After approximately 15 minutes of inactivity, the service may spin down. The first request may take around a minute while the service starts; subsequent requests should respond normally. :contentReference[oaicite:0]{index=0}
+> **Note:** The demo is hosted on Render's free tier. After approximately 15 minutes of inactivity, the service may spin down. The first request may take around a minute while the service starts; subsequent requests should respond normally.
 
 A Python client and FastAPI service for extracting structured profile information from LinkedIn - profile summary, experience, education, skills, certifications, and projects - as clean JSON.
 
