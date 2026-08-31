@@ -1,7 +1,6 @@
 from linkedin_api.client.client import LinkedInClient
 from linkedin_api.utils import build_detail_payload
 
-
 SKILLS_SCREEN_ID = "com.linkedin.sdui.flagshipnav.profile." "ProfileSkillDetails"
 
 SKILLS_PAGE_KEY = "profile_view_base_skills_details"

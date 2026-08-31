@@ -7,7 +7,6 @@ from linkedin_api.parsers.common import (
     get_collection_items,
 )
 
-
 _SKILLS_COLLECTION = "SkillDetails"
 
 

@@ -7,7 +7,6 @@ from linkedin_api.parsers.profile import get_profile
 from linkedin_api.parsers.section import get_parsed_sections
 from linkedin_api.parsers.skills import get_skills
 
-
 app = FastAPI(
     title="LinkedIn API",
     version="0.1.0",
