@@ -24,6 +24,7 @@ classifiers = [
 dependencies = [
     "fastapi",
     "pydantic",
+    "pydantic-settings",
     "requests>=2.31",
     "uvicorn[standard]",
 ]
@@ -42,5 +43,5 @@ target-version = ["py312"]
 
 
 [tool.mypy]
-    python_version = "3.12"
-    plugins = ["pydantic.mypy"]
+python_version = "3.12"
+plugins = ["pydantic.mypy"]
