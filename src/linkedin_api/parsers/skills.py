@@ -1,16 +1,14 @@
 import re
 
-from linkedin_api.models import Education
+from linkedin_api.models import Skill
 
 
-_EDUCATION_COLLECTION = "EducationTopLevelSection"
+SKILLS_COLLECTION = "SkillsTopLevelSection"
 
-_REFERENCE_RE = re.compile(
+REFERENCE_RE = re.compile(
     r"\$L([0-9a-z]+)",
     re.IGNORECASE,
 )
-
-_DATE_RE = re.compile(r"^(?:\d{4}\s*[–-]\s*\d{4})$")
 
 
 def _extract_definitions(
@@ -51,7 +49,7 @@ def _resolve_refs(
                 stack | {key},
             )
 
-        return _REFERENCE_RE.sub(
+        return REFERENCE_RE.sub(
             replace,
             value,
         )
@@ -82,56 +80,17 @@ def _get_text_children(
     return values
 
 
-def _is_date(
-    value: str,
-) -> bool:
-    return bool(_DATE_RE.fullmatch(value))
-
-
-def _parse_item(
-    values: list[str],
-) -> Education | None:
-    date_index = next(
-        (index for index, value in enumerate(values) if _is_date(value)),
-        None,
-    )
-
-    if date_index is None or date_index < 2:
-        return None
-
-    school = values[date_index - 2]
-
-    degree_field = values[date_index - 1]
-
-    if "," in degree_field:
-        degree, field_of_study = degree_field.split(
-            ",",
-            1,
-        )
-    else:
-        degree = degree_field
-        field_of_study = None
-
-    return Education(
-        school=school,
-        degree=degree.strip() if degree else None,
-        field_of_study=(field_of_study.strip() if field_of_study else None),
-        dates=values[date_index],
-    )
-
-
-def parse_education(
+def parse_skills(
     data: str,
-) -> list[Education]:
+) -> list[Skill]:
     """
-    Parse education entries from one raw LinkedIn
-    profile section response.
+    Parse skills from raw LinkedIn section data.
     """
 
     definitions = _extract_definitions(data)
 
     collection_key = next(
-        (key for key, value in definitions.items() if _EDUCATION_COLLECTION in value),
+        (key for key, value in definitions.items() if SKILLS_COLLECTION in value),
         None,
     )
 
@@ -150,7 +109,8 @@ def parse_education(
         )
     )
 
-    education: list[Education] = []
+    skills: list[Skill] = []
+    seen: set[str] = set()
 
     for index, match in enumerate(item_matches):
         start = match.start()
@@ -170,15 +130,20 @@ def parse_education(
             resolved_item,
         )
 
-        values = [
-            value
-            for index, value in enumerate(values)
-            if index == 0 or value != values[index - 1]
-        ]
+        for value in values:
+            if value in {
+                "Skills",
+                "Show all",
+                "Visible",
+                "Collapsed",
+                "Expanded",
+            }:
+                continue
 
-        parsed = _parse_item(values)
+            if value not in seen:
+                seen.add(value)
+                skills.append(Skill(name=value))
 
-        if parsed is not None:
-            education.append(parsed)
+            break
 
-    return education
+    return skills

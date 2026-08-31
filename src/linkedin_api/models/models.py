@@ -102,6 +102,14 @@ class Education(BaseModel):
     dates: str | None = None
 
 
+class Skill(BaseModel):
+    """
+    LinkedIn skill.
+    """
+
+    name: str
+
+
 class ProfileRequest(BaseModel):
     """
     Credentials and profile identifier required to fetch a profile.
@@ -123,3 +131,4 @@ class ProfileResponse(BaseModel):
     profile: Profile
     experience: list[Experience]
     education: list[Education]
+    skills: list[Skill]

@@ -2,9 +2,9 @@ from fastapi import FastAPI
 
 from linkedin_api.client import LinkedInClient
 from linkedin_api.models import ProfileRequest, ProfileResponse
-from linkedin_api.parsers.education import get_education
 from linkedin_api.parsers.experience import get_experience
 from linkedin_api.parsers.profile import get_profile
+from linkedin_api.parsers.section import get_parsed_sections
 
 
 app = FastAPI(
@@ -27,13 +27,15 @@ def profile(
         request.vanity_name,
         profile_data.profile_id,
     )
-    education = get_education(
+    education, skills = get_parsed_sections(
         client,
         request.vanity_name,
         profile_data.profile_id,
     )
+    print(education, skills)
     return ProfileResponse(
         profile=profile_data,
         experience=experience,
         education=education,
+        skills=skills,
     )

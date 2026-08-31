@@ -1,0 +1,199 @@
+import json
+import re
+
+
+_REFERENCE_RE = re.compile(
+    r"\$L([0-9a-z]+)",
+    re.IGNORECASE,
+)
+
+_TEXT_PATTERNS = (
+    re.compile(r'"children":\["([^"]*)"\]'),
+    re.compile(r'"children":\[(?:null,)+"([^"]*)"\]'),
+)
+
+_NOISE = {
+    "",
+    "undefined",
+    "$undefined",
+    "Visible",
+    "Collapsed",
+    "Expanded",
+}
+
+
+def extract_definitions(
+    data: str,
+) -> dict[str, str]:
+    """
+    Extract React Server Component definitions.
+    """
+
+    definitions: dict[str, str] = {}
+
+    for line in data.splitlines():
+        match = re.match(
+            r"^([0-9a-z]+):(.+)$",
+            line,
+            re.IGNORECASE,
+        )
+
+        if match is not None:
+            definitions[match.group(1)] = match.group(2)
+
+    return definitions
+
+
+def resolve_refs(
+    value: str,
+    definitions: dict[str, str],
+) -> str:
+    """
+    Resolve RSC references recursively.
+    """
+
+    def resolve(
+        current: str,
+        stack: frozenset[str] = frozenset(),
+    ) -> str:
+        def replace(
+            match: re.Match[str],
+        ) -> str:
+            key = match.group(1)
+
+            if key in stack:
+                return ""
+
+            definition = definitions.get(key)
+
+            if definition is None:
+                return match.group(0)
+
+            return resolve(
+                definition,
+                stack | {key},
+            )
+
+        previous = None
+
+        while current != previous:
+            previous = current
+            current = _REFERENCE_RE.sub(
+                replace,
+                current,
+            )
+
+        return current
+
+    return resolve(value)
+
+
+def extract_text(
+    data: str,
+) -> list[str]:
+    """
+    Extract useful human-readable text while preserving order.
+    """
+
+    values: list[str] = []
+    seen: set[str] = set()
+
+    for pattern in _TEXT_PATTERNS:
+        for match in pattern.finditer(data):
+            value = match.group(1)
+
+            try:
+                value = json.loads(f'"{value}"')
+            except json.JSONDecodeError:
+                pass
+
+            value = value.strip()
+
+            if _is_noise(value) or value in seen:
+                continue
+
+            seen.add(value)
+            values.append(value)
+
+    return values
+
+
+def _is_noise(
+    value: str,
+) -> bool:
+    """
+    Return whether a value is LinkedIn rendering noise.
+    """
+
+    return (
+        value in _NOISE
+        or value.startswith("$L")
+        or value.startswith("com.linkedin.sdui.")
+        or value.startswith("ProfileNullStateCardAnchor")
+        or value.startswith("profile_")
+    )
+
+
+def get_collection(
+    data: str,
+    identifier: str,
+) -> tuple[str, dict[str, str]] | None:
+    """
+    Find and resolve a collection containing an identifier.
+    """
+
+    definitions = extract_definitions(data)
+
+    collection_key = next(
+        (
+            key
+            for key, value in definitions.items()
+            if identifier.lower() in value.lower()
+        ),
+        None,
+    )
+
+    if collection_key is None:
+        return None
+
+    return (
+        resolve_refs(
+            definitions[collection_key],
+            definitions,
+        ),
+        definitions,
+    )
+
+
+def get_collection_items(
+    collection: str,
+    definitions: dict[str, str],
+) -> list[str]:
+    """
+    Split a collection into resolved entity items.
+    """
+
+    matches = list(
+        re.finditer(
+            r'"key":"entity-collection-item-[^"]+"',
+            collection,
+        )
+    )
+
+    items: list[str] = []
+
+    for index, match in enumerate(matches):
+        start = match.start()
+
+        end = (
+            matches[index + 1].start() if index + 1 < len(matches) else len(collection)
+        )
+
+        items.append(
+            resolve_refs(
+                collection[start:end],
+                definitions,
+            )
+        )
+
+    return items
