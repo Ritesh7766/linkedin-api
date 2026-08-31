@@ -50,8 +50,6 @@ class Experience(BaseModel):
     dates: str | None
     location: str | None = None
     company_duration: str | None = None
-    company_id: str | None = None
-    company_url: str | None = None
 
 
 class Profile(BaseModel):
