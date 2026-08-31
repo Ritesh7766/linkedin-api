@@ -340,7 +340,7 @@ def parse_experience(
 def get_experience(
     client: LinkedInClient,
     vanity_name: str,
-    profile_id: str,
+    profile_id: str | None,
 ) -> list[Experience]:
     """
     Fetch and parse LinkedIn work experience.
@@ -359,6 +359,8 @@ def get_experience(
     list[Experience]
         Parsed work experience entries.
     """
+    if not profile_id:
+        return []
     return parse_experience(
         fetch_experience(
             client,
