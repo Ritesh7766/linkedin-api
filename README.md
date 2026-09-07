@@ -38,6 +38,8 @@ This project works by identifying which internal component endpoints LinkedIn's 
 
 This uses your own logged-in session cookies to make requests as you, from your own machine - not a public or officially sanctioned integration. This is against LinkedIn's User Agreement (which prohibits automated data collection regardless of whether the data is public or the account is your own); it isn't a CFAA/hacking issue since no access controls are being bypassed and only data visible to the authenticated session is retrieved, but it is a breach-of-contract matter, not a compliant use of the platform. Built and run at personal/educational scale, not intended for bulk extraction of other users' data or commercial use. Use responsibly and at your own risk.
 
+This tool is for educational purposes only. Make sure to comply with LinkedIn's Terms of Service and use responsibly. The authors are not responsible for any misuse of this tool.
+
 ## How it works
 
 ```
