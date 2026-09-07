@@ -5,7 +5,6 @@
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
 **Live API:** [https://linkedin-api-8dbd.onrender.com](https://linkedin-api-8dbd.onrender.com)
-
 **Full API documentation and interactive testing interface:**
 [https://linkedin-api-8dbd.onrender.com/docs](https://linkedin-api-8dbd.onrender.com/docs)
 
@@ -13,7 +12,15 @@
 >
 > **Note:** The demo is hosted on Render's free tier. After approximately 15 minutes of inactivity, the service may spin down. The first request may take around a minute while the service starts; subsequent requests should respond normally.
 
-A Python client and FastAPI service for extracting structured profile information from LinkedIn - profile summary, experience, education, skills, certifications, and projects - as clean JSON.
+A reverse-engineering case study: LinkedIn doesn't expose a public profile API, so this project identifies the internal, undocumented endpoints LinkedIn's own frontend calls, replicates the session-authenticated request flow, and parses the resulting obfuscated payloads into clean, typed JSON (profile summary, experience, education, skills, certifications, projects).
+
+## What this demonstrates
+
+- Reverse-engineering an undocumented, session-authenticated internal API — not a published REST API with a stable contract
+- Working with LinkedIn's session-cookie auth flow (`li_at`, `JSESSIONID`) rather than a documented OAuth/API-key scheme
+- Deciphering and parsing a payload format that isn't meant to be consumed by anything other than LinkedIn's own React renderer — opaque cross-referenced definition IDs (`$L4`, `$L19`, ...), multiple unrelated sections bundled into one response
+- Building a fetcher → parser → typed-model pipeline that isolates the brittle, platform-coupled extraction layer from a stable, validated (Pydantic) output layer
+- Shipping it as an actual service (FastAPI, Dockerized, deployed, CI) rather than leaving it as a one-off script
 
 ## What this is (and isn't)
 
@@ -26,7 +33,10 @@ This project works by identifying which internal component endpoints LinkedIn's 
 - LinkedIn's frontend can (and does) change without notice. Since nothing here is a documented, versioned API, any restructuring of LinkedIn's RSC payloads, component names, or collection identifiers can silently break parsing at any time, with no deprecation warning.
 - Parsing is done with pattern matching over the raw response text (regex-based extraction of RSC definitions and text fragments), not a real JSON/RSC parser - it works because the payloads happen to be consistent enough to pattern-match today, not because the format is documented or stable.
 - Coverage is partial. Profile summary, experience, education, skills, certifications, and projects are implemented; other sections (languages, honors & awards, volunteering, recommendations, etc.) are not yet.
-- This uses your own logged-in session cookies to make requests as you, from your own machine - not a public or officially sanctioned integration. Use responsibly and at your own risk with respect to LinkedIn's Terms of Service.
+
+## Legal & ethical notes
+
+This uses your own logged-in session cookies to make requests as you, from your own machine - not a public or officially sanctioned integration. This is against LinkedIn's User Agreement (which prohibits automated data collection regardless of whether the data is public or the account is your own); it isn't a CFAA/hacking issue since no access controls are being bypassed and only data visible to the authenticated session is retrieved, but it is a breach-of-contract matter, not a compliant use of the platform. Built and run at personal/educational scale, not intended for bulk extraction of other users' data or commercial use. Use responsibly and at your own risk.
 
 ## How it works
 
